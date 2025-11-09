@@ -1,0 +1,109 @@
+---
+title: "Task 2 – Subsetting & Missing Data in the Aqualis Universe"
+format: html
+---
+
+```{r}
+# Load previous data (from Task 1)
+sequence_vector <- seq(20, 100, by = 10)
+set.seed(42)
+logical_vector <- sample(c(TRUE, FALSE), 10, replace = TRUE)
+planet_df <- data.frame(
+  Region = c("North", "South", "East", "West", "Central"),
+  Population_mil = c(3.4, 2.1, 1.8, 4.2, 2.9),
+  Habitable = c(TRUE, TRUE, TRUE, FALSE, TRUE),
+  Resource_Level = c("high", "medium", "medium", "low", "high")
+)
+```
+
+---
+
+## 2.1 Querying Vectors
+
+```{r}
+# 2.1.1 Sequence vector
+sequence_vector[3]
+sequence_vector[2:5]
+sequence_vector[sequence_vector > 40]
+
+# 2.1.2 Logical vector
+logical_vector[logical_vector]
+which(logical_vector)
+```
+
+---
+
+## 2.2 Querying the List
+
+```{r}
+planet_list <- list(
+  numeric_vector = c(24.5, 9.8, 3500.2, 0.87, 2, 8, 3),
+  sequence_vector = sequence_vector,
+  logical_vector = logical_vector,
+  matrix = matrix(sample(-50:50, 9, replace = TRUE), 3, 3),
+  description = "Aqualis is an ocean planet rich in research and biodiversity."
+)
+
+# Access elements
+planet_list$description
+planet_list[[4]]  # the matrix
+planet_list$sequence_vector[2]  # 2nd element from sequence vector
+```
+
+---
+
+## 2.3 Investigating Data Frame
+
+```{r}
+# First 3 rows
+head(planet_df, 3)
+
+# Value from 4th row, 1st column
+planet_df[4, 1]
+
+# Logical column as vector
+planet_df$Habitable
+
+# Logical subsetting
+df_subset <- planet_df[planet_df$Population_mil > 2.5, ]
+df_subset
+
+# %in% subsetting
+df_subset_2 <- planet_df[planet_df$Region %in% c("North", "East"), ]
+df_subset_2
+```
+
+---
+
+## 2.4 Handling Missing Data (NA)
+
+```{r}
+df_corrupted <- planet_df
+df_corrupted[2, 2] <- NA
+df_corrupted[4, 3] <- NA
+df_corrupted[5, 4] <- NA
+
+df_corrupted
+
+# Find NAs
+sum(is.na(df_corrupted))
+colSums(is.na(df_corrupted))
+
+# Mean with NA
+mean(df_corrupted$Population_mil, na.rm = TRUE)
+
+# Remove NAs
+df_clean <- na.omit(df_corrupted)
+df_clean
+```
+
+---
+
+## 2.5 Bonus: which()
+
+```{r}
+highest_pop_index <- which.max(planet_df$Population_mil)
+planet_df[highest_pop_index, ]
+```
+
+

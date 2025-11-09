@@ -1,0 +1,133 @@
+---
+title: "Task 1 – Exploring Data Types in R"
+format: html
+---
+
+## 1.1 Atomic Types
+
+Let's define attributes of our fictional planet **Aqualis**.
+
+```{r}
+# Numeric values
+temperature <- 24.5
+gravity <- 9.8
+ocean_depth <- 3500.2
+radiation_level <- 0.87
+
+# Integer values
+number_of_moons <- 2L
+cities_count <- 8L
+research_stations <- 3L
+
+# Logical values
+has_water <- TRUE
+is_inhabited <- TRUE
+
+# Character values
+planet_name <- "Aqualis"
+region <- "Hydros Sector"
+category <- "Ocean Planet"
+
+# Describe them in a sentence
+cat(
+  planet_name, "is located in", region, 
+  "and is classified as an", category,
+  "with", number_of_moons, "moons and average temperature", temperature, "°C.\n"
+)
+```
+
+---
+
+## 1.2 Vectors
+
+```{r}
+# Numeric + integer vector
+numeric_vector <- c(temperature, gravity, ocean_depth, radiation_level, 
+                    number_of_moons, cities_count, research_stations)
+
+# Sequence vector
+sequence_vector <- seq(20, 100, by = 10)
+
+# Logical vector (10 random TRUE/FALSE)
+set.seed(42)
+logical_vector <- sample(c(TRUE, FALSE), 10, replace = TRUE)
+
+numeric_vector
+sequence_vector
+logical_vector
+```
+
+---
+
+## 1.3 Matrix
+
+```{r}
+# Create 3x3 matrix
+set.seed(123)
+planet_matrix <- matrix(sample(-50:50, 9, replace = TRUE), nrow = 3, ncol = 3)
+
+# Name rows and columns
+rownames(planet_matrix) <- c("Ocean", "Land", "Atmosphere")
+colnames(planet_matrix) <- c("Pressure", "Temperature", "Density")
+
+planet_matrix
+
+# Row and column means
+rowMeans(planet_matrix)
+colMeans(planet_matrix)
+```
+
+---
+
+## 1.4 List
+
+```{r}
+planet_list <- list(
+  temperature = temperature,
+  gravity = gravity,
+  ocean_depth = ocean_depth,
+  numeric_vector = numeric_vector,
+  sequence_vector = sequence_vector,
+  logical_vector = logical_vector,
+  matrix = planet_matrix,
+  description = "Aqualis is an ocean-covered exoplanet with moderate gravity and thriving research stations."
+)
+
+planet_list
+```
+
+---
+
+## 1.5 Factor
+
+```{r}
+habitat_levels <- c("poor", "average", "rich", "average", "poor", "rich")
+habitat_factor <- factor(habitat_levels, levels = c("poor", "average", "rich"))
+table(habitat_factor)
+```
+
+---
+
+## 1.6 Data Frame
+
+```{r}
+planet_df <- data.frame(
+  region = c("North", "South", "East", "West", "Central"),
+  population_mil = c(3.4, 2.1, 1.8, 4.2, 2.9),
+  is_habitable = c(TRUE, TRUE, TRUE, FALSE, TRUE),
+  resource_level = c("high", "medium", "medium", "low", "high")
+)
+
+# Rename columns
+colnames(planet_df) <- c("Region", "Population_mil", "Habitable", "Resource_Level")
+
+# Structure and summary
+str(planet_df)
+summary(planet_df)
+
+# Derived column (resources per person)
+planet_df$Resource_Index <- ifelse(planet_df$Resource_Level == "high", 1.5,
+                            ifelse(planet_df$Resource_Level == "medium", 1.0, 0.5))
+
+planet_df
+

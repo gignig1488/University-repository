@@ -1,0 +1,113 @@
+---
+title: "Task 3"
+author: "Computer Support STU"
+format: html
+---
+
+## 3.1 
+
+Data from: https://www.kaggle.com/datasets/sooryaprakash12/ocean-temperature
+
+## 3.2
+
+```{r}
+
+suppressPackageStartupMessages({
+  library(dplyr)
+  library(readr)
+  library(readxl)
+  library(tibble)
+})
+
+
+data_file <- "ocean_temperature.csv"
+
+
+if (file.exists(data_file)) {
+  ext <- tolower(tools::file_ext(data_file))
+  if (ext %in% c("csv","txt")) {
+    my_real_data <- read_csv(data_file, show_col_types = FALSE)
+  } else if (ext %in% c("xls","xlsx")) {
+    my_real_data <- read_excel(data_file)
+    my_real_data <- as_tibble(my_real_data)
+  } else {
+    stop("Unsupported file extension. Use .csv, .xlsx, .xls or .txt.")
+  }
+  message("Dataset loaded from: ", data_file)
+} else {
+ 
+  message("Data file not found. Creating sample dataset 'my_real_data' (60 rows) for testing.")
+  set.seed(2025)
+  my_real_data <- tibble(
+    city = rep(c("Alpha","Beta","Gamma","Delta","Epsilon"), each = 12),
+    population = sample(1000:100000, 60, replace = TRUE),
+    area_sq_km = sample(10:500, 60, replace = TRUE),
+    region = rep(c("North","South","East","West","Central","Island"), 10),
+    temperature = round(runif(60, -5, 30),1),
+    status = sample(c("Successful","Failed"), 60, replace = TRUE),
+    launch_year = sample(1995:2025, 60, replace = TRUE)
+  )
+}
+
+
+glimpse(my_real_data)
+head(my_real_data, 6)
+summary(my_real_data)
+
+
+if (nrow(my_real_data) < 50) {
+  stop("Dataset must have at least 50 rows. Current rows: ", nrow(my_real_data))
+}
+if (ncol(my_real_data) < 4) {
+  stop("Dataset must have at least 4 columns. Current columns: ", ncol(my_real_data))
+}
+
+num_cols <- sum(sapply(my_real_data, is.numeric))
+char_cols <- sum(sapply(my_real_data, function(x) is.character(x) || is.factor(x)))
+if (num_cols < 1 || char_cols < 1) {
+  stop("Dataset must include at least one numeric column and one character/factor column.")
+}
+```
+
+## 3.3
+
+```{r}
+# Question 1: Which 5 cities have the highest population?
+my_real_data %>%
+  select(city, population) %>%
+  arrange(desc(population)) %>%
+  slice_head(n = 5) %>%
+  print()
+
+# Question 2: What is the average temperature per region?
+my_real_data %>%
+  group_by(region) %>%
+  summarise(
+    avg_temp = mean(temperature, na.rm = TRUE),
+    n = n(),
+    .groups = "drop"
+  ) %>%
+  arrange(desc(avg_temp)) %>%
+  print()
+
+# Question 3: How many observations belong to each status (Successful/Failed)?
+my_real_data %>%
+  group_by(status) %>%
+  summarise(count = n(), .groups = "drop") %>%
+  print()
+
+# Question 4: What is the population density for each city? (create new column 'density')
+my_real_data %>%
+  filter(!is.na(population) & !is.na(area_sq_km) & area_sq_km > 0) %>%
+  mutate(density = population / area_sq_km) %>%
+  select(city, population, area_sq_km, density) %>%
+  arrange(desc(density)) %>%
+  print()
+
+# Question 5: Find all successful missions (status == "Successful") launched after 2010
+my_real_data %>%
+  filter(launch_year > 2010, status == "Successful") %>%
+  select(city, launch_year, status, population) %>%
+  arrange(desc(launch_year)) %>%
+  print(n = 50)
+```

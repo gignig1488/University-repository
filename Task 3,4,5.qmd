@@ -1,0 +1,117 @@
+
+---
+title: "Weather Data Analysis"
+format: html
+---
+
+```{r}
+library(readr)
+library(dplyr)
+library(ggplot2)
+
+data <- read_csv("weather_data.csv")
+head(data)
+```
+
+## Task 3 — Interrogation with dplyr
+
+### 1. Select only date and temperature
+```{r}
+data |> select(date, temperature)
+```
+
+### 2. Filter days hotter than 20°C
+```{r}
+data |> filter(temperature > 20)
+```
+
+### 3. Arrange by humidity descending
+```{r}
+data |> arrange(desc(humidity))
+```
+
+### 4. Mutate: add "feels_like" temperature
+```{r}
+data <- data |> mutate(feels_like = temperature - wind_speed*0.2)
+head(data)
+```
+
+### 5. Group by city and summarise avg temp
+```{r}
+data |> group_by(city) |> summarise(mean_temp = mean(temperature))
+```
+
+## Task 4 — Functions
+
+### Greeting function
+```{r}
+welcome <- function(name){
+  cat("Welcome,", name, "to the Weather Universe!\n")
+}
+
+welcome("Student")
+```
+
+### Loading function
+```{r}
+load_and_inspect <- function(file){
+  df <- read_csv(file)
+  glimpse(df)
+  head(df)
+  return(df)
+}
+
+my_data <- load_and_inspect("weather_data.csv")
+```
+
+### Query function
+```{r}
+filter_by_temp <- function(data, min_temp){
+  data |> filter(temperature > min_temp)
+}
+
+filter_by_temp(my_data, 18)
+```
+
+### Reporting function
+```{r}
+generate_report <- function(data, city_name){
+  subset <- data |> filter(city == city_name)
+  cat("Report for:", city_name, "\n")
+  cat("Records:", nrow(subset), "\n")
+  cat("Avg Temp:", mean(subset$temperature), "\n")
+  cat("Max Wind:", max(subset$wind_speed), "\n")
+}
+
+generate_report(my_data, "Bratislava")
+```
+
+## Task 5 — Visualisations
+
+### Histogram
+```{r}
+hist(my_data$temperature, main="Temperature Distribution", xlab="Temperature (C)")
+```
+
+### Scatter plot
+```{r}
+ggplot(my_data, aes(x=temperature, y=humidity)) +
+  geom_point() +
+  geom_smooth() +
+  labs(title="Temperature vs Humidity", x="Temperature", y="Humidity")
+```
+
+### Boxplot
+```{r}
+ggplot(my_data, aes(x=city, y=temperature, fill=city)) +
+  geom_boxplot() +
+  labs(title="Temperature by City", x="City", y="Temperature")
+```
+
+### Facet plot
+```{r}
+ggplot(my_data, aes(x=temperature)) +
+  geom_histogram(bins=15) +
+  facet_wrap(~city) +
+  labs(title="Temperature Distribution by City")
+```
